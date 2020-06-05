@@ -1,7 +1,9 @@
 const env = process.env.NODE_ENV || 'development';
 
 const config = require('./config/config')[env];
-const app = require('express')();
+const app = require('express');
+
+app()
 
 require('./config/express')(app);
 require('./config/routes')(app);
