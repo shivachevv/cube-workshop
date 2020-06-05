@@ -16,5 +16,10 @@
     },
     "scripts": {
         "start": "nodemon"
+    },
+    "nodemonConfig": {
+        "ignore": [
+            "config/database.json"
+        ]
     }
 }

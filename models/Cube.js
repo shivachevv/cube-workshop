@@ -32,11 +32,9 @@ class Cube {
 
             fs.writeFile(dbPath, JSON.stringify(DB), (err) => {
                 if (err) throw err
-                console.log(`New Cube is successfully added!\nTotal ${DB.length} cubes in Database!`);
             })
+            return `New Cube is successfully added!\nTotal ${DB.length} cubes in Database!`
         })
-
-
     }
 }
 
