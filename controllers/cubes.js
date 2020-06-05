@@ -26,8 +26,26 @@ const saveCube = (name, description, imageUrl, difficulty) => {
     return newCube.save()
 }
 
+const searchCubes = (name) => {
+    let cubes = fs.readFileSync(dbFile)
+    cubes = JSON.parse(cubes)
+
+    let result = []
+    
+    for (let i = 0; i < cubes.length; i++) {
+        
+        if (cubes[i].name.includes(name)) {
+            result.push(cubes[i])
+        }
+    }
+    
+    return result
+    
+}
 
 module.exports = {
     getCubes,
-    getCube
+    getCube,
+    saveCube,
+    searchCubes
 }

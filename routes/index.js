@@ -1,6 +1,11 @@
 // TODO: Require Controllers...
 
-const {getCubes, getCube} = require('../controllers/cubes')
+const {
+    getCubes,
+    getCube,
+    saveCube,
+    searchCubes
+} = require('../controllers/cubes')
 const {
     Router
 } = require('express')
@@ -23,12 +28,30 @@ router.get('/create', (req, res) => {
         title: 'Create Cube'
     })
 })
-router.get('/details/:id', (req, res) => {    
+router.post('/create', (req, res) => {
+    const {
+        name,
+        description,
+        imageUrl,
+        difficulty
+    } = req.body
+
+    saveCube(name, description, imageUrl, difficulty)
+
+    res.redirect('/')
+})
+router.get('/details/:id', (req, res) => {
     res.render('details', {
         title: 'Cube Details',
-        cube:getCube(req.params.id)
+        cube: getCube(req.params.id)
     })
 })
+router.post('/search', (req, res) => {
+    
+    res.render('index', {
+        title: 'Search',
+        cubes: searchCubes(req.body.search)
+    })})
 router.get('*', (req, res) => {
     res.render('404', {
         title: 'Page Not Found'
