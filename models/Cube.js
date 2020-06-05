@@ -28,7 +28,7 @@ class Cube {
             }
 
             const DB = JSON.parse(data)
-            DB.push(newData);
+            DB.push(newData)
 
             fs.writeFile(dbPath, JSON.stringify(DB), (err) => {
                 if (err) throw err
