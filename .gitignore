@@ -1,2 +1,4 @@
 node_modules
-config/database.js
+./config/database.js
+id_rsa
+id_rsa.pub
