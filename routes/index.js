@@ -1,28 +1,26 @@
-// TODO: Require Controllers...
-
+const Cube = require('../models/Cube')
 const {
     getCubes,
     getCube,
-    saveCube,
+    // saveCube,
     searchCubes
 } = require('../controllers/cubes')
-const {
-    Router
-} = require('express')
-
-
+const {Router}= require('express')
 const router = Router()
-router.get('/', (req, res) => {
+
+router.get('/', async (req, res) => {
     res.render('index', {
         title: 'Cube Workshop',
-        cubes: getCubes()
+        cubes: await getCubes()
     })
 })
+
 router.get('/about', (req, res) => {
     res.render('about', {
         title: 'About Page'
     })
 })
+
 router.get('/create', (req, res) => {
     res.render('create', {
         title: 'Create Cube'
@@ -36,28 +34,45 @@ router.post('/create', (req, res) => {
         difficulty
     } = req.body
 
-    saveCube(name, description, imageUrl, difficulty)
-
-    res.redirect('/')
-})
-router.get('/details/:id', (req, res) => {
-    res.render('details', {
-        title: 'Cube Details',
-        cube: getCube(req.params.id)
+    const cube = new Cube({
+        name,
+        description,
+        imageUrl,
+        difficulty
+    })
+    cube.save((err) => {
+        if (err) {
+            console.log(err);
+            throw err
+        } else {
+            res.redirect('/')
+        }
     })
 })
-router.post('/search', (req, res) => {
+
+router.get('/details/:id', async (req, res) => {
+    let a = await getCube(req.params.id)
+    
+    res.render('details', {
+        title: 'Cube Details',
+        cube: await getCube(req.params.id)
+    })
+})
+
+router.post('/search', async (req, res) => {
+    console.log(req.body);
     
     res.render('index', {
         title: 'Search',
-        cubes: searchCubes(req.body.search)
-    })})
+        cubes: await searchCubes(req.body.name, req.body.from, req.body.to)
+    })
+})
+
 router.get('*', (req, res) => {
     res.render('404', {
         title: 'Page Not Found'
     })
 })
-
 
 
 module.exports = router

@@ -1,41 +1,39 @@
-const {
-    v4
-} = require('uuid')
-const fs = require('fs')
-const dbPath = './config/database.json'
+const mongoose = require('mongoose')
 
-class Cube {
-    constructor(name, description, imageUrl, difficulty) {
-        this.id = v4()
-        this.name = name || 'New Cube'
-        this.description = description || 'No description'
-        this.imageUrl = imageUrl || ''
-        this.difficulty = difficulty || 0
-    }
+// class Cube {
+//     constructor(name, description, imageUrl, difficulty) {
+//         this.id = v4()
+//         this.name = name || 'New Cube'
+//         this.description = description || 'No description'
+//         this.imageUrl = imageUrl || ''
+//         this.difficulty = difficulty || 0
+//     }
+// }
 
-    save() {
-        const newData = {
-            id: this.id,
-            name: this.name,
-            description: this.description,
-            imageUrl: this.imageUrl,
-            difficulty: this.difficulty
-        }
+const CubeSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    description: {
+        type: String,
+        required: true,
+        maxlength: 2000
+    },
+    imageUrl: {
+        type: String,
+        required: true,
+    },
+    difficulty: {
+        type: Number,
+        required: true,
+        min: 1,
+        max: 10
+    },
+    accessories: [{
+        type: 'ObjectId',
+        ref: 'Accessory'
+    }]
+})
 
-        fs.readFile(dbPath, (err, data) => {
-            if (err) {
-                throw err
-            }
-
-            const DB = JSON.parse(data)
-            DB.push(newData)
-
-            fs.writeFile(dbPath, JSON.stringify(DB), (err) => {
-                if (err) throw err
-            })
-            return `New Cube is successfully added!\nTotal ${DB.length} cubes in Database!`
-        })
-    }
-}
-
-module.exports = Cube
+module.exports = mongoose.model('Cube', CubeSchema)
