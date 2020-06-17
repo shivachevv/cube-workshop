@@ -3,9 +3,13 @@ const mongoose = require('mongoose')
 const config = require('./config/config')[env];
 const express = require('express');
 const indexRouter = require('./routes')
+const cubeRouter = require('./routes/cube')
+const authRouter = require('./routes/auth')
 const app = express()
 
 require('./config/express')(app);
+app.use('/', authRouter)
+app.use('/', cubeRouter)
 app.use('/', indexRouter)
 
 mongoose.connect(config.databaseUrl,{
