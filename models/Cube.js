@@ -1,15 +1,5 @@
 const mongoose = require('mongoose')
 
-// class Cube {
-//     constructor(name, description, imageUrl, difficulty) {
-//         this.id = v4()
-//         this.name = name || 'New Cube'
-//         this.description = description || 'No description'
-//         this.imageUrl = imageUrl || ''
-//         this.difficulty = difficulty || 0
-//     }
-// }
-
 const CubeSchema = new mongoose.Schema({
     name: {
         type: String,
@@ -33,7 +23,11 @@ const CubeSchema = new mongoose.Schema({
     accessories: [{
         type: 'ObjectId',
         ref: 'Accessory'
-    }]
+    }],
+    creatorId: {
+        type: 'ObjectId',
+        ref: 'User'
+      }
 })
 
 module.exports = mongoose.model('Cube', CubeSchema)

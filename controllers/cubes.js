@@ -22,7 +22,7 @@ const searchCubes = async (name, diffFrom, diffTo) => {
     }).lean()
 }
 
-const updateCube = async (cubeId, accId) => {
+const updateCubeAccessories = async (cubeId, accId) => {
     return await Cube.findByIdAndUpdate(cubeId, {
         $addToSet: {
             accessories: [accId]
@@ -32,9 +32,31 @@ const updateCube = async (cubeId, accId) => {
     })
 }
 
+const updateCube = async (cubeId, updated) => {
+    return await Cube.findByIdAndUpdate(cubeId,
+            updated, {
+                useFindAndModify: false
+            }
+        )
+        .catch(err => {
+            console.log('cube update error', err);
+        })
+}
+
+const deleteCube = async (id) => {
+    return await Cube.findByIdAndDelete({
+            _id: id
+        })
+        .catch(err => {
+            console.log('cube update error', err);
+        })
+}
+
 module.exports = {
     getCubes,
     getCube,
     searchCubes,
-    updateCube
+    updateCubeAccessories,
+    updateCube,
+    deleteCube
 }

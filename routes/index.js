@@ -1,11 +1,17 @@
 const Cube = require('../models/Cube')
 const Accessory = require('../models/Accessory')
-
+const jwt = require("jsonwebtoken");
+const privateKey = 'MY-SOFTUNI-PROJECT-PRIVATE-KEY'
+const {
+    authAccess,
+    getUserStatus,
+    authAccessJSON
+} = require('../controllers/user')
 const {
     getCubes,
     getCube,
     searchCubes,
-    updateCube
+    updateCubeAccessories,
 } = require('../controllers/cubes')
 const {
     getAccs
@@ -15,25 +21,29 @@ const {
 } = require('express')
 const router = Router()
 
-router.get('/', async (req, res) => {
+router.get('/', getUserStatus, async (req, res) => {
     res.render('index', {
         title: 'Cube Workshop',
-        cubes: await getCubes()
+        cubes: await getCubes(),
+        isLogged: req.isLogged
     })
 })
 
-router.get('/about', (req, res) => {
+router.get('/about', getUserStatus, (req, res) => {
     res.render('about', {
-        title: 'About Page'
+        title: 'About Page',
+        isLogged: req.isLogged
+
     })
 })
 
-router.get('/create', (req, res) => {
+router.get('/create', authAccess, getUserStatus, (req, res) => {
     res.render('create', {
-        title: 'Create Cube'
+        title: 'Create Cube',
+        isLogged: req.isLogged
     })
 })
-router.post('/create', (req, res) => {
+router.post('/create', authAccessJSON, (req, res) => {
     const {
         name,
         description,
@@ -41,11 +51,15 @@ router.post('/create', (req, res) => {
         difficulty
     } = req.body
 
+    const token = req.cookies['authid']
+    const decodedObj = jwt.verify(token, privateKey)
+
     const cube = new Cube({
         name,
         description,
         imageUrl,
-        difficulty
+        difficulty,
+        creatorId: decodedObj.userID
     })
     cube.save((err) => {
         if (err) {
@@ -57,14 +71,15 @@ router.post('/create', (req, res) => {
     })
 })
 
-router.get('/details/:id', async (req, res) => {
+router.get('/details/:id', getUserStatus, async (req, res) => {
     let cube = await getCube(req.params.id)
 
     res.render('details', {
         title: 'Cube Details',
         id: req.params.id,
         cube,
-        isAccessory: !!cube.accessories.length
+        isAccessory: !!cube.accessories.length,
+        isLogged: req.isLogged
     })
 })
 
@@ -75,12 +90,13 @@ router.post('/search', async (req, res) => {
     })
 })
 
-router.get('/create/accessory', (req, res) => {
+router.get('/create/accessory', authAccess, getUserStatus, (req, res) => {
     res.render('createAccessory', {
-        title: 'Create Accessory'
+        title: 'Create Accessory',
+        isLogged: req.isLogged
     })
 })
-router.post('/create/accessory', (req, res) => {
+router.post('/create/accessory', authAccessJSON, (req, res) => {
     const {
         name,
         description,
@@ -102,7 +118,7 @@ router.post('/create/accessory', (req, res) => {
     })
 
 })
-router.get('/attach/accessory/:id', async (req, res) => {
+router.get('/attach/accessory/:id', authAccess, getUserStatus, async (req, res) => {
     let cube = await getCube(req.params.id)
     let accessories = await getAccs()
 
@@ -121,14 +137,15 @@ router.get('/attach/accessory/:id', async (req, res) => {
         id: req.params.id,
         ...cube,
         notAttachedAccs,
-        canAttachAccessories
+        canAttachAccessories,
+        isLogged: req.isLogged
     })
 })
-router.post('/attach/accessory/:id', async (req, res) => {
+router.post('/attach/accessory/:id', authAccessJSON, async (req, res) => {
     const {
         accessory
     } = req.body
-    await updateCube(req.params.id, accessory)
+    await updateCubeAccessories(req.params.id, accessory)
     res.redirect(`/details/${req.params.id}`)
 })
 
